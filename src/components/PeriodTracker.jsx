@@ -1,12 +1,53 @@
-import React, { useState } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { ChevronLeft, ChevronRight, Lock, Unlock, Settings } from 'lucide-react';
+import { getFirestore, doc, setDoc, getDoc } from 'firebase/firestore';
+import { getAuth } from 'firebase/auth';
 
 const PeriodTracker = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [cycleLength, setCycleLength] = useState(28);
   const [periodLength, setPeriodLength] = useState(5);
   const [markedDates, setMarkedDates] = useState([]);
+  const [lockedDates, setLockedDates] = useState([]);
   const [showSetup, setShowSetup] = useState(true);
+  const [isEditing, setIsEditing] = useState(true);
+  
+  const auth = getAuth();
+  const db = getFirestore();
+
+  // Load user data from Firebase
+  useEffect(() => {
+    const loadUserData = async () => {
+      if (!auth.currentUser) return;
+      
+      const userDoc = doc(db, 'periodData', auth.currentUser.uid);
+      const docSnap = await getDoc(userDoc);
+      
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        setCycleLength(data.cycleLength || 28);
+        setPeriodLength(data.periodLength || 5);
+        setLockedDates(data.lockedDates?.map(d => new Date(d)) || []);
+        setShowSetup(!data.hasSetup);
+      }
+    };
+    
+    loadUserData();
+  }, [auth.currentUser]);
+
+  // Save to Firebase
+  const saveToFirebase = async (newLockedDates = lockedDates) => {
+    if (!auth.currentUser) return;
+    
+    const userDoc = doc(db, 'periodData', auth.currentUser.uid);
+    await setDoc(userDoc, {
+      cycleLength,
+      periodLength,
+      lockedDates: newLockedDates.map(d => d.toISOString()),
+      hasSetup: true,
+      lastUpdated: new Date().toISOString()
+    }, { merge: true });
+  };
 
   // Get calendar data for current month
   const getCalendarDays = () => {
@@ -19,12 +60,10 @@ const PeriodTracker = () => {
     const days = [];
     const startPadding = firstDay.getDay();
     
-    // Add padding for start of month
     for (let i = 0; i < startPadding; i++) {
       days.push(null);
     }
     
-    // Add all days of month
     for (let i = 1; i <= lastDay.getDate(); i++) {
       days.push(new Date(year, month, i));
     }
@@ -32,26 +71,29 @@ const PeriodTracker = () => {
     return days;
   };
 
-  // Calculate predicted period dates
-  const getPredictedDates = (startDate) => {
-    const predictions = [];
-    let currentDate = new Date(startDate);
+  // Calculate predicted period dates (±3 days)
+  const getPredictedDates = () => {
+    if (lockedDates.length === 0) return [];
     
-    // Calculate next 3 cycles
-    for (let i = 0; i < 3; i++) {
-      for (let j = 0; j < periodLength; j++) {
-        predictions.push(new Date(currentDate));
-        currentDate.setDate(currentDate.getDate() + 1);
-      }
-      // Move to next cycle start
-      currentDate.setDate(currentDate.getDate() + (cycleLength - periodLength));
+    const lastPeriod = new Date(Math.max(...lockedDates.map(d => d.getTime())));
+    const predictions = [];
+    
+    // Calculate next expected period start
+    const nextPeriod = new Date(lastPeriod);
+    nextPeriod.setDate(nextPeriod.getDate() + cycleLength);
+    
+    // Add dates 3 days before and after predicted start
+    for (let i = -3; i <= 3; i++) {
+      const predictedDate = new Date(nextPeriod);
+      predictedDate.setDate(predictedDate.getDate() + i);
+      predictions.push(predictedDate);
     }
     
     return predictions;
   };
 
   const toggleDate = (date) => {
-    if (!date) return;
+    if (!date || !isEditing) return;
     
     const dateStr = date.toDateString();
     if (markedDates.some(d => d.toDateString() === dateStr)) {
@@ -59,6 +101,19 @@ const PeriodTracker = () => {
     } else {
       setMarkedDates([...markedDates, date]);
     }
+  };
+
+  const lockPeriod = async () => {
+    const newLockedDates = [...lockedDates, ...markedDates];
+    setLockedDates(newLockedDates);
+    setMarkedDates([]);
+    setIsEditing(false);
+    await saveToFirebase(newLockedDates);
+  };
+
+  const startNewPeriod = () => {
+    setIsEditing(true);
+    setMarkedDates([]);
   };
 
   const nextMonth = () => {
@@ -73,10 +128,12 @@ const PeriodTracker = () => {
     return date && markedDates.some(d => d.toDateString() === date.toDateString());
   };
 
+  const isDateLocked = (date) => {
+    return date && lockedDates.some(d => d.toDateString() === date.toDateString());
+  };
+
   const isPredicted = (date) => {
-    if (!date || markedDates.length === 0) return false;
-    const predictions = getPredictedDates(markedDates[markedDates.length - 1]);
-    return predictions.some(d => d.toDateString() === date.toDateString());
+    return date && getPredictedDates().some(d => d.toDateString() === date.toDateString());
   };
 
   if (showSetup) {
@@ -107,7 +164,10 @@ const PeriodTracker = () => {
             />
           </div>
           <button
-            onClick={() => setShowSetup(false)}
+            onClick={() => {
+              setShowSetup(false);
+              saveToFirebase();
+            }}
             className="w-full bg-pink-500 text-white py-2 rounded hover:bg-pink-600 transition-colors"
           >
             Start Tracking
@@ -123,13 +183,22 @@ const PeriodTracker = () => {
         <h2 className="text-2xl font-bold">
           {selectedDate.toLocaleString('default', { month: 'long', year: 'numeric' })}
         </h2>
-        <div className="flex space-x-2">
-          <button onClick={prevMonth} className="p-2 hover:bg-gray-100 rounded">
-            <ChevronLeft className="w-5 h-5" />
+        <div className="flex space-x-4 items-center">
+          <button
+            onClick={() => setShowSetup(true)}
+            className="p-2 hover:bg-gray-100 rounded flex items-center gap-2"
+          >
+            <Settings className="w-5 h-5" />
+            <span className="text-sm">Settings</span>
           </button>
-          <button onClick={nextMonth} className="p-2 hover:bg-gray-100 rounded">
-            <ChevronRight className="w-5 h-5" />
-          </button>
+          <div className="flex space-x-2">
+            <button onClick={prevMonth} className="p-2 hover:bg-gray-100 rounded">
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+            <button onClick={nextMonth} className="p-2 hover:bg-gray-100 rounded">
+              <ChevronRight className="w-5 h-5" />
+            </button>
+          </div>
         </div>
       </div>
 
@@ -145,26 +214,58 @@ const PeriodTracker = () => {
             key={index}
             onClick={() => toggleDate(date)}
             className={`
-              aspect-square p-2 rounded-lg flex items-center justify-center
+              aspect-square p-2 rounded-lg flex items-center justify-center relative
               ${date ? 'hover:bg-gray-100' : ''}
               ${isDateMarked(date) ? 'bg-pink-500 text-white hover:bg-pink-600' : ''}
-              ${isPredicted(date) ? 'bg-pink-200 hover:bg-pink-300' : ''}
+              ${isDateLocked(date) ? 'bg-purple-500 text-white' : ''}
+              ${isPredicted(date) ? 'bg-yellow-200 hover:bg-yellow-300' : ''}
+              ${!isEditing ? 'cursor-default' : ''}
             `}
-            disabled={!date}
+            disabled={!date || !isEditing}
           >
             {date ? date.getDate() : ''}
+            {isDateLocked(date) && (
+              <Lock className="w-3 h-3 absolute bottom-1 right-1" />
+            )}
           </button>
         ))}
       </div>
 
-      <div className="mt-6 flex items-center justify-center space-x-4">
-        <div className="flex items-center">
-          <div className="w-4 h-4 bg-pink-500 rounded mr-2"></div>
-          <span className="text-sm">Period Days</span>
+      <div className="mt-6">
+        <div className="flex items-center justify-center space-x-4 mb-4">
+          <div className="flex items-center">
+            <div className="w-4 h-4 bg-pink-500 rounded mr-2"></div>
+            <span className="text-sm">Current Period</span>
+          </div>
+          <div className="flex items-center">
+            <div className="w-4 h-4 bg-purple-500 rounded mr-2"></div>
+            <span className="text-sm">Locked Period</span>
+          </div>
+          <div className="flex items-center">
+            <div className="w-4 h-4 bg-yellow-200 rounded mr-2"></div>
+            <span className="text-sm">Predicted (±3 days)</span>
+          </div>
         </div>
-        <div className="flex items-center">
-          <div className="w-4 h-4 bg-pink-200 rounded mr-2"></div>
-          <span className="text-sm">Predicted Days</span>
+
+        <div className="flex justify-center space-x-4">
+          {isEditing ? (
+            <button
+              onClick={lockPeriod}
+              disabled={markedDates.length === 0}
+              className="flex items-center gap-2 px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-600 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <Lock className="w-4 h-4" />
+              Lock Period
+            </button>
+          ) : (
+            <button
+              onClick={startNewPeriod}
+              className="flex items-center gap-2 px-4 py-2 bg-pink-500 text-white rounded hover:bg-pink-600"
+            >
+              <Unlock className="w-4 h-4" />
+              Track New Period
+            </button>
+          )}
         </div>
       </div>
     </div>
