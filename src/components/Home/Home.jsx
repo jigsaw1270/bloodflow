@@ -1,30 +1,18 @@
+// components/Home/Home.jsx
 import React from 'react';
+import { useAuth } from '../../contexts/Authcontext';
 
 const Home = () => {
+    const { user } = useAuth();
+
     return (
-        <div>
-            <h2 className='text-5xl text-blue-600 font-telma'>This is Home</h2>
-            <div className="collapse bg-deep-purple">
-  <input type="radio" name="my-accordion-1" defaultChecked />
-  <div className="collapse-title text-xl font-medium font-clash">Click to open this one and close others</div>
-  <div className="collapse-content">
-    <p>hello</p>
-  </div>
-</div>
-<div className="collapse bg-base-200">
-  <input type="radio" name="my-accordion-1" />
-  <div className="collapse-title text-xl font-medium">Click to open this one and close others</div>
-  <div className="collapse-content">
-    <p>hello</p>
-  </div>
-</div>
-<div className="collapse bg-base-200">
-  <input type="radio" name="my-accordion-1" />
-  <div className="collapse-title text-xl font-medium">Click to open this one and close others</div>
-  <div className="collapse-content">
-    <p>hello</p>
-  </div>
-</div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">
+                Welcome, {user.displayName || user.email}!
+            </h2>
+            <p className="text-gray-600">
+                This is your protected home page. Only authenticated users can see this content.
+            </p>
         </div>
     );
 };
