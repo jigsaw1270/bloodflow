@@ -9,7 +9,10 @@ import {
 import Home from './components/Home/Home';
 import Main from './layout/Main';
 import Login from './components/Login/Login';
-import { AuthProvider, ProtectedRoute, PublicRoute } from './contexts/Authcontext';
+import { AuthProvider, ProtectedRoute } from './contexts/Authcontext'; // Adjust the import path as needed
+
+// Import your Firebase app instance
+import app from './firebase/firebase.init';
 
 const router = createBrowserRouter([
   {
@@ -26,11 +29,7 @@ const router = createBrowserRouter([
       },
       {
         path: '/login',
-        element: (
-          <PublicRoute>
-            <Login />
-          </PublicRoute>
-        )
+        element: <Login />
       }
     ]
   },

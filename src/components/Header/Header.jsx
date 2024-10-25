@@ -1,59 +1,51 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/Authcontext';
 import { getAuth, signOut } from 'firebase/auth';
 
 const Header = () => {
     const { user } = useAuth();
-    const navigate = useNavigate();
     const auth = getAuth();
 
     const handleSignOut = async () => {
         try {
             await signOut(auth);
-            navigate('/login');
         } catch (error) {
             console.error('Error signing out:', error);
         }
     };
 
     return (
-        <nav className="bg-white shadow-sm">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <div className="bg-white shadow-sm">
+            <div className="max-w-7xl mx-auto px-4 py-4">
                 <div className="flex justify-between items-center">
-                    <div className="flex space-x-8">
-                        <Link 
-                            to="/" 
-                            className="text-gray-900 hover:text-gray-600 font-medium"
-                        >
-                            Home
-                        </Link>
-                    </div>
-                    <div className="flex items-center space-x-4">
-                        {user ? (
-                            <div className="flex items-center space-x-4">
-                                <span className="text-sm text-gray-500">
-                                    {user.displayName || user.email}
+                    <Link to="/" className="text-xl font-semibold text-gray-800">
+                        Home
+                    </Link>
+                    
+                    {user && (
+                        <div className="flex items-center space-x-4">
+                            <div className="flex items-center space-x-3">
+                                <img 
+                                    src={user.photoURL} 
+                                    alt={user.displayName}
+                                    className="w-8 h-8 rounded-full"
+                                />
+                                <span className="text-gray-700 font-medium">
+                                    {user.displayName}
                                 </span>
-                                <button
-                                    onClick={handleSignOut}
-                                    className="text-sm text-red-600 hover:text-red-800"
-                                >
-                                    Sign Out
-                                </button>
                             </div>
-                        ) : (
-                            <Link 
-                                to="/login"
-                                className="text-gray-900 hover:text-gray-600 font-medium"
+                            <button
+                                onClick={handleSignOut}
+                                className="px-4 py-2 text-sm text-red-600 hover:text-red-800 font-medium"
                             >
-                                Login
-                            </Link>
-                        )}
-                    </div>
+                                Sign Out
+                            </button>
+                        </div>
+                    )}
                 </div>
             </div>
-        </nav>
+        </div>
     );
 };
 

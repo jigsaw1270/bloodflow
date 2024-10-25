@@ -1,15 +1,16 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
-import { Navigate, useLocation } from 'react-router-dom';
+import app from '../firebase/firebase.init'; // Make sure this path matches your file structure
+import { useLocation } from 'react-router-dom';
 
-// Create auth context
 const AuthContext = createContext(null);
 
-// Auth provider component
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
-    const auth = getAuth();
+    
+    // Initialize Firebase Auth with the app instance
+    const auth = getAuth(app); // Pass the app instance here
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -18,30 +19,34 @@ export const AuthProvider = ({ children }) => {
         });
 
         return () => unsubscribe();
-    }, [auth]);
+    }, []);
+
+    if (loading) {
+        return (
+            <div className="h-screen w-full flex items-center justify-center">
+                <div className="w-8 h-8 border-4 border-blue-600 rounded-full border-t-transparent animate-spin"></div>
+            </div>
+        );
+    }
 
     return (
         <AuthContext.Provider value={{ user, loading }}>
-            {!loading && children}
+            {children}
         </AuthContext.Provider>
     );
 };
 
-// Custom hook to use auth context
-export const useAuth = () => useContext(AuthContext);
-
-// Protected route component
-export const ProtectedRoute = ({ children }) => {
-    const { user, loading } = useAuth();
-    const location = useLocation();
-
-    if (loading) {
-        return (
-            <div className="min-h-screen flex items-center justify-center">
-                <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-gray-900"></div>
-            </div>
-        );
+export const useAuth = () => {
+    const context = useContext(AuthContext);
+    if (!context) {
+        throw new Error('useAuth must be used within an AuthProvider');
     }
+    return context;
+};
+
+export const ProtectedRoute = ({ children }) => {
+    const { user } = useAuth();
+    const location = useLocation();
 
     if (!user) {
         return <Navigate to="/login" state={{ from: location }} replace />;
@@ -50,22 +55,4 @@ export const ProtectedRoute = ({ children }) => {
     return children;
 };
 
-// Public route component (for login page)
-export const PublicRoute = ({ children }) => {
-    const { user, loading } = useAuth();
-    const location = useLocation();
-
-    if (loading) {
-        return (
-            <div className="min-h-screen flex items-center justify-center">
-                <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-gray-900"></div>
-            </div>
-        );
-    }
-
-    if (user) {
-        return <Navigate to={location.state?.from?.pathname || '/'} replace />;
-    }
-
-    return children;
-};
+export default AuthProvider;
