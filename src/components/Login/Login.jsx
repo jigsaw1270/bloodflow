@@ -47,12 +47,12 @@ const Login = () => {
     }
 
     return (
-        <div>
+        <div className='bg-lavender-pink-gradient'>
             {/* user ? logout : sign in */}
 
             {
                 user ?
-                    <button onClick={handleSignOut}>Sign out</button> :
+                    <button className='btn btn-lavender-purple' onClick={handleSignOut}>Sign out</button> :
                     <>
                         <button onClick={handleGoogleSignIn}>Google login</button>
                         <button onClick={handleGithubSignIn}>Github Login</button>

@@ -14,6 +14,9 @@ module.exports = {
         clash: ['clash', 'sans-serif'],
         telma: ['telma', 'sans-serif'],
       },
+      backgroundImage: {
+        'lavender-pink-gradient': 'linear-gradient(to right, #8967B3, #CB80AB)',
+      },
     },
   },
   daisyui: {
