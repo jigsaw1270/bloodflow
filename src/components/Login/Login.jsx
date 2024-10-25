@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { GithubAuthProvider, GoogleAuthProvider, getAuth, signInWithPopup } from "firebase/auth";
+import { GoogleAuthProvider, getAuth, signInWithPopup } from "firebase/auth";
 import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
@@ -10,16 +10,17 @@ const Login = () => {
 
     const handleSignIn = async (provider) => {
         try {
-            setLoading(true);
-            setError(null);
-            await signInWithPopup(auth, provider);
-            navigate('/');
+          setLoading(true);
+          setError(null);
+          const result = await signInWithPopup(auth, provider);
+          const { from } = location.state || { from: { pathname: "/" } };
+          navigate(from);  // Redirect to previous location or default to "/"
         } catch (error) {
-            setError(error.message);
+          setError(error.message);
         } finally {
-            setLoading(false);
+          setLoading(false);
         }
-    };
+      };
 
     return (
         <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">

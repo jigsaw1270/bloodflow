@@ -10,6 +10,10 @@ const Header = () => {
     const handleSignOut = async () => {
         try {
             await signOut(auth);
+            window.location.href = '/login'; // Navigate to the login page
+            setTimeout(() => {
+                window.location.reload(); // Force a reload after a short delay
+            }, 1000); // Adjust the delay as needed (100 ms is just an example)
         } catch (error) {
             console.error('Error signing out:', error);
         }
