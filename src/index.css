@@ -15,3 +15,9 @@
   font-weight: 100 900; /* Set according to the variable range of your font */
   font-style: normal;
 }
+
+@layer base{
+  body{
+    background-color: #222831;
+  }
+}
