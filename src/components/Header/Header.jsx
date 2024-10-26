@@ -10,6 +10,7 @@ const Header = () => {
     const handleSignOut = async () => {
         try {
             await signOut(auth);
+            localStorage.removeItem('user');
             window.location.href = '/login'; // Navigate to the login page
             setTimeout(() => {
                 window.location.reload(); // Force a reload after a short delay

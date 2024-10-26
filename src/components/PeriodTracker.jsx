@@ -83,7 +83,7 @@ const PeriodTracker = () => {
     nextPeriod.setDate(nextPeriod.getDate() + cycleLength);
     
     // Add dates 3 days before and after predicted start
-    for (let i = -3; i <= 3; i++) {
+    for (let i = -1; i <= 1; i++) {
       const predictedDate = new Date(nextPeriod);
       predictedDate.setDate(predictedDate.getDate() + i);
       predictions.push(predictedDate);
