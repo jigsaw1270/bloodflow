@@ -9,7 +9,9 @@ module.exports = {
         'lavender-purple': '#8967B3',
         'rose-pink': '#CB80AB',
         'pale-yellow': '#E6D9A2',
-        'light-green' : '#E9EED9'
+        'light-green' : '#E9EED9',
+        'red-dark' : '#740938',
+        'red-semidark' : '#CC2B52'
       },
       fontFamily: {
         clash: ['clash', 'sans-serif'],

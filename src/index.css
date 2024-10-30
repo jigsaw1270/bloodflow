@@ -21,3 +21,12 @@
     background-color: #222831;
   }
 }
+
+
+@layer utilities {
+  .inset-shadow {
+    border-radius: 17px;
+    box-shadow: inset 7px 7px 2px #d4c895,
+            inset -7px -7px 2px #f8eaaf;
+  }
+}

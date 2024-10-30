@@ -40,7 +40,7 @@ const Header = () => {
                                     {user.displayName}
                                 </span>
                             </div>
-                        <button className='btn btn-sm btn-outline btn-warning' onClick={handleSignOut}>Sign out</button>
+                        <button className='btn btn-sm btn-outline btn-pale-yellow' onClick={handleSignOut}>Sign out</button>
                         </div>
                     )}
                 </div>
