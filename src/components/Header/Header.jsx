@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/Authcontext';
 import { getAuth, signOut } from 'firebase/auth';
+import SpaceButton from '../Button/SpaceButton';
 
 const Header = () => {
     const { user } = useAuth();
@@ -20,16 +21,16 @@ const Header = () => {
     };
 
     return (
-        <div className="bg-white shadow-sm">
+        <div className="bg-lavender-pink-gradient shadow-sm rounded-xl">
             <div className="max-w-7xl mx-auto px-4 py-4">
-                <div className="flex justify-between items-center">
-                    <Link to="/" className="text-xl font-semibold text-gray-800">
-                        Home
+                <div className="md:flex justify-between items-center">
+                    <Link to="/" className="text-2xl font-bold text-white font-telma">
+                        Bloodflow
                     </Link>
                     
                     {user && (
-                        <div className="flex items-center space-x-4">
-                            <div className="flex items-center space-x-3">
+                        <div className="flex items-center justify-between space-x-4 font-clash">
+                            <div className="md:flex md:items-center md:space-x-3">
                                 <img 
                                     src={user.photoURL} 
                                     alt={user.displayName}
@@ -39,12 +40,7 @@ const Header = () => {
                                     {user.displayName}
                                 </span>
                             </div>
-                            <button
-                                onClick={handleSignOut}
-                                className="px-4 py-2 text-sm text-red-600 hover:text-red-800 font-medium"
-                            >
-                                Sign Out
-                            </button>
+                        <button className='btn btn-sm btn-outline btn-warning' onClick={handleSignOut}>Sign out</button>
                         </div>
                     )}
                 </div>

@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, Lock, Unlock, Settings } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Lock, Unlock, Settings, Droplets, RefreshCcw } from 'lucide-react';
 import { getFirestore, doc, setDoc, getDoc } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
+import SpaceButton from './Button/SpaceButton';
 
 const PeriodTracker = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -138,57 +139,57 @@ const PeriodTracker = () => {
 
   if (showSetup) {
     return (
-      <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-lg">
+      <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-lg font-clash">
         <h2 className="text-2xl font-bold mb-6">Setup Your Cycle</h2>
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium mb-2">Period Length (days)</label>
+            <label className="text-xl font-medium mb-2 flex items-center justify-center gap-2"><Droplets/>Period Length (days)</label>
             <input
               type="number"
               value={periodLength}
               onChange={(e) => setPeriodLength(parseInt(e.target.value))}
-              className="w-full p-2 border rounded"
+              className="w-full p-2 border rounded-xl focus:outline-deep-purple"
               min="1"
               max="10"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-2">Cycle Length (days)</label>
+            <label className="text-xl font-medium mb-2 flex items-center justify-center gap-2"><RefreshCcw/>Cycle Length (days)</label>
             <input
               type="number"
               value={cycleLength}
               onChange={(e) => setCycleLength(parseInt(e.target.value))}
-              className="w-full p-2 border rounded"
+              className="w-full p-2 border rounded-xl focus:outline-deep-purple"
               min="21"
               max="35"
             />
           </div>
-          <button
+          <SpaceButton
             onClick={() => {
               setShowSetup(false);
               saveToFirebase();
             }}
-            className="w-full bg-pink-500 text-white py-2 rounded hover:bg-pink-600 transition-colors"
+            text='Start Tracking'
+            // className="w-full bg-pink-500 text-white py-2 rounded hover:bg-pink-600 transition-colors"
           >
-            Start Tracking
-          </button>
+          </SpaceButton>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-3xl mx-auto p-6 bg-white rounded-lg shadow-lg">
+    <div className="md:max-w-3xl mx-auto p-6 bg-pale-yellow rounded-lg shadow-lg">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold">
+        <h2 className="md:text-2xl text-lg font-bold">
           {selectedDate.toLocaleString('default', { month: 'long', year: 'numeric' })}
         </h2>
-        <div className="flex space-x-4 items-center">
+        <div className="md:flex md:space-x-4 items-center">
           <button
             onClick={() => setShowSetup(true)}
             className="p-2 hover:bg-gray-100 rounded flex items-center gap-2"
           >
-            <Settings className="w-5 h-5" />
+            <Settings className="md:w-5 md:h-5 w-4 h-4" />
             <span className="text-sm">Settings</span>
           </button>
           <div className="flex space-x-2">
@@ -202,7 +203,7 @@ const PeriodTracker = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-7 gap-1">
+      <div className="grid grid-cols-7 gap-1 font-clash">
         {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
           <div key={day} className="text-center font-medium py-2">
             {day}
@@ -218,7 +219,7 @@ const PeriodTracker = () => {
               ${date ? 'hover:bg-gray-100' : ''}
               ${isDateMarked(date) ? 'bg-pink-500 text-white hover:bg-pink-600' : ''}
               ${isDateLocked(date) ? 'bg-purple-500 text-white' : ''}
-              ${isPredicted(date) ? 'bg-yellow-200 hover:bg-yellow-300' : ''}
+              ${isPredicted(date) ? 'bg-red-600 hover:bg-red-200' : ''}
               ${!isEditing ? 'cursor-default' : ''}
             `}
             disabled={!date || !isEditing}
@@ -242,7 +243,7 @@ const PeriodTracker = () => {
             <span className="text-sm">Locked Period</span>
           </div>
           <div className="flex items-center">
-            <div className="w-4 h-4 bg-yellow-200 rounded mr-2"></div>
+            <div className="w-4 h-4 bg-red-600 rounded mr-2"></div>
             <span className="text-sm">Predicted (±3 days)</span>
           </div>
         </div>

@@ -2,9 +2,9 @@
 import React from 'react';
 import './SpaceButton.css';
 
-const SpaceButton = ({ text = "SPACE", onClick }) => {
+const SpaceButton = ({ text = "SPACE", onClick ,className = "" }) => {
   return (
-    <button type="button" className="space-btn" onClick={onClick}>
+    <button type="button" className={`space-btn ${className}`} onClick={onClick}>
       <strong>{text}</strong>
       <div id="container-stars">
         <div id="stars"></div>
