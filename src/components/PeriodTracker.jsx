@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, Lock, Unlock, Settings, Droplets, RefreshCcw, Waves, Space, Apple } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Lock, Unlock, Settings, Droplets, RefreshCcw, Waves, Space, Apple, AudioLines } from 'lucide-react';
 import { getFirestore, doc, setDoc, getDoc } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import SpaceButton from './Button/SpaceButton';
@@ -48,6 +48,7 @@ const PeriodTracker = () => {
       hasSetup: true,
       lastUpdated: new Date().toISOString()
     }, { merge: true });
+    setShowSetup(false);
   };
 
   // Get calendar data for current month
@@ -164,49 +165,53 @@ const PeriodTracker = () => {
   const isOvulation = (date) => {
     return date && getOvulationDays().some(d => d.toDateString() === date.toDateString());
   };
-  if (showSetup) {
-    return (
-      <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-lg font-clash">
-        <h2 className="text-2xl font-bold mb-6">Setup Your Cycle</h2>
-        <div className="space-y-4">
-          <div>
-            <label className="text-xl font-medium mb-2 flex items-center justify-center gap-2"><Droplets />Period Length (days)</label>
-            <input
-              type="number"
-              value={periodLength}
-              onChange={(e) => setPeriodLength(parseInt(e.target.value))}
-              className="w-full p-2 border rounded-xl focus:outline-deep-purple"
-              min="1"
-              max="10"
-            />
-          </div>
-          <div>
-            <label className="text-xl font-medium mb-2 flex items-center justify-center gap-2"><RefreshCcw />Cycle Length (days)</label>
-            <input
-              type="number"
-              value={cycleLength}
-              onChange={(e) => setCycleLength(parseInt(e.target.value))}
-              className="w-full p-2 border rounded-xl focus:outline-deep-purple"
-              min="21"
-              max="35"
-            />
-          </div>
-          <SpaceButton
-            onClick={() => {
-              setShowSetup(false);
-              saveToFirebase();
-            }}
-            text='Start Tracking'
-          // className="w-full bg-pink-500 text-white py-2 rounded hover:bg-pink-600 transition-colors"
-          >
-          </SpaceButton>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="md:max-w-3xl mx-auto p-6 bg-pale-yellow rounded-lg shadow-lg">
+    {/* Show DaisyUI Modal when showSetup is true */}
+    {showSetup && (
+        <div className="modal modal-open shadow-xl">
+          <div className="modal-box relative bg-white-skyblue font-clash">
+            <button
+              onClick={() => setShowSetup(false)}
+              className="btn btn-sm btn-circle absolute right-2 top-2 font-bold"
+            >✕</button>
+            <h3 className="font-bold text-2xl flex items-center justify-center gap-2"><AudioLines/>Setup Your Cycle<AudioLines/></h3>
+            <div className="space-y-4 mt-4">
+              <div>
+                <label className="text-lg flex items-center justify-center gap-2  text-white font-semibold"><Droplets/>Period Length (days)</label>
+                <input
+                  type="number"
+                  value={periodLength}
+                  onChange={(e) => setPeriodLength(parseInt(e.target.value))}
+                  className="input input-bordered w-full focus:ring-2 focus:ring-white text-white font-bold text-2xl font-mono"
+                  min="1"
+                  max="10"
+                />
+              </div>
+              <div>
+                <label className="text-lg flex items-center justify-center gap-2 text-white font-semibold"><RefreshCcw/>Cycle Length (days)</label>
+                <input
+                  type="number"
+                  value={cycleLength}
+                  onChange={(e) => setCycleLength(parseInt(e.target.value))}
+                  className="input input-bordered w-full focus:ring-2 focus:ring-white text-white font-bold text-2xl font-mono"
+                  min="21"
+                  max="35"
+                />
+              </div>
+              <SpaceButton
+                onClick={() => {
+                  setShowSetup(false);
+                  saveToFirebase();
+                }}
+                text="Start Tracking"
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="flex justify-between items-center mb-6">
         <h2 className="md:text-2xl text-lg font-bold">
           {selectedDate.toLocaleString('default', { month: 'long', year: 'numeric' })}

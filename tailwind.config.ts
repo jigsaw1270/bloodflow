@@ -20,6 +20,7 @@ module.exports = {
       },
       backgroundImage: {
         'lavender-pink-gradient': 'linear-gradient(to right, #8967B3, #CB80AB)',
+        'white-skyblue': 'linear-gradient(to top, #D1E9F6, #37AFE1)',
       },
     },
   },
