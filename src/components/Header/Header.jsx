@@ -21,7 +21,7 @@ const Header = () => {
     };
 
     return (
-        <div className="bg-lavender-pink-gradient shadow-sm rounded-xl">
+        <div className="bg-white-skyblue shadow-sm rounded-xl">
             <div className="max-w-7xl mx-auto px-4 py-4">
                 <div className="md:flex justify-between items-center">
                     <Link to="/" className="text-2xl font-bold text-white font-telma">
