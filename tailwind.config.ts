@@ -11,7 +11,8 @@ module.exports = {
         'pale-yellow': '#E6D9A2',
         'light-green' : '#E9EED9',
         'red-dark' : '#740938',
-        'red-semidark' : '#CC2B52'
+        'red-semidark' : '#CC2B52',
+        'skyblue' : '#37AFE1',
       },
       fontFamily: {
         clash: ['clash', 'sans-serif'],

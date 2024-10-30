@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, Lock, Unlock, Settings, Droplets, RefreshCcw, Waves, Space } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Lock, Unlock, Settings, Droplets, RefreshCcw, Waves, Space, Apple } from 'lucide-react';
 import { getFirestore, doc, setDoc, getDoc } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import SpaceButton from './Button/SpaceButton';
@@ -146,6 +146,24 @@ const PeriodTracker = () => {
 
     return date >= lastLockedDate && date <= endOngoingPeriod;
   };
+
+  const getOvulationDays = () => {
+    if (lockedDates.length === 0) return []; // No locked dates yet
+    
+    const lastPeriodDate = new Date(Math.max(...lockedDates.map(d => d.getTime())));
+    const midCycleDay = Math.floor(cycleLength / 2);
+    
+    return [
+      new Date(lastPeriodDate.setDate(lastPeriodDate.getDate() + midCycleDay - 1)), // 13th day
+      new Date(lastPeriodDate.setDate(lastPeriodDate.getDate() + 1)), // 14th day
+      new Date(lastPeriodDate.setDate(lastPeriodDate.getDate() + 1)), // 15th day
+    ];
+  };
+  
+  // Add `isOvulation` to check if a date falls within ovulation days
+  const isOvulation = (date) => {
+    return date && getOvulationDays().some(d => d.toDateString() === date.toDateString());
+  };
   if (showSetup) {
     return (
       <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-lg font-clash">
@@ -230,19 +248,23 @@ const PeriodTracker = () => {
               ${isDateLocked(date) ? 'bg-purple-500 text-white' : ''}
               ${isPredicted(date) ? 'bg-red-dark hover:bg-red-semidark' : ''}
               ${isOngoingPeriod(date) ? 'bg-red-semidark text-white' : ''} 
+              ${isOvulation(date) ? 'bg-skyblue text-white' : ''}
               ${!isEditing ? 'cursor-default' : ''}
             `}
             disabled={!date || !isEditing}
           >
             {date ? date.getDate() : ''}
             {isDateLocked(date) && (
-              <Lock className="md:size-5 size-2 absolute bottom-1 right-1" />
+              <Lock className="md:size-5 size-2 absolute bottom-3 right-3" />
             )}
             {isOngoingPeriod(date) && (
-              <Waves className="md:size-5 size-2 absolute bottom-1 right-1 text-white" />
+              <Waves className="md:size-5 size-2 absolute bottom-3 right-3 text-white" />
             )}
             {isPredicted(date) && (
-              <Droplets className="md:size-5 size-2 absolute bottom-1 right-1 text-white" />
+              <Droplets className="md:size-5 size-2 absolute bottom-3 right-3 text-white" />
+            )}
+            {isOvulation(date) && (
+              <Apple className="md:size-5 size-2 absolute bottom-3 right-3 text-white" />
             )}
           </button>
         ))}
@@ -259,7 +281,11 @@ const PeriodTracker = () => {
             <span className="text-sm">Locked Period</span>
           </div>
           <div className="flex items-center">
-            <div className="w-4 h-4 bg-red-dark rounded mr-2"></div>
+            <div className="w-4 h-4 bg-skyblue rounded-xl mr-2"></div>
+            <span className="text-sm">Ovulation</span>
+          </div>
+          <div className="flex items-center">
+            <div className="w-4 h-4 bg-red-dark rounded-xl mr-2"></div>
             <span className="text-sm">Predicted (±3 days)</span>
           </div>
         </div>
