@@ -161,6 +161,20 @@ const PeriodTracker = () => {
       new Date(lastPeriodDate.setDate(lastPeriodDate.getDate() + 1)), // 15th day
     ];
   };
+
+   // Calculate current cycle day
+   const getCurrentCycleDay = () => {
+    if (lockedDates.length === 0) return null;
+    
+    const lastLockedDate = new Date(Math.max(...lockedDates.map(d => d.getTime())));
+    const diffInTime = today.getTime() - lastLockedDate.getTime();
+    const diffInDays = Math.floor(diffInTime / (1000 * 3600 * 24));
+    
+    // Ensure it wraps around according to the cycle length
+    return (diffInDays % cycleLength) + 1;
+  };
+
+  const currentCycleDay = getCurrentCycleDay();
   
   // Add `isOvulation` to check if a date falls within ovulation days
   const isOvulation = (date) => {
@@ -216,6 +230,11 @@ const PeriodTracker = () => {
       <div className="flex justify-between items-center mb-6">
         <h2 className="md:text-2xl text-lg font-bold">
           {selectedDate.toLocaleString('default', { month: 'long', year: 'numeric' })}
+          {currentCycleDay && (
+                        <div className="md:text-lg text-base font-medium text-gray-800">
+                            Day <span className='text-mono font-bold md:text-2xl'>({currentCycleDay})</span> of your cycle
+                        </div>
+                    )}
         </h2>
         <div className="md:flex md:space-x-4 items-center">
           <button
@@ -299,7 +318,6 @@ const PeriodTracker = () => {
             <span className="text-xs md:text-lg">Predicted (±3 days)</span>
           </div>
         </div>
-
         <div className="flex justify-center space-x-4">
           {isEditing ? (
             <SpaceButton

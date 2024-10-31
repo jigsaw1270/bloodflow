@@ -2,12 +2,13 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/Authcontext';
 import { getAuth, signOut } from 'firebase/auth';
-import SpaceButton from '../Button/SpaceButton';
 import { Sprout } from 'lucide-react';
+import placeholder from '../../assets/images/placeholder.svg'
 
 const Header = () => {
     const { user } = useAuth();
     const auth = getAuth();
+    const fallbackImage = placeholder;
 
     const handleSignOut = async () => {
         try {
@@ -26,14 +27,13 @@ const Header = () => {
             <div className="max-w-7xl mx-auto px-4 py-4">
                 <div className="md:flex justify-between items-center">
                     <Link to="/" className="text-2xl font-bold text-white font-telma flex items-center gap-2">
-                      <Sprout/>  Bloodflow
+                        <Sprout />  Bloodflow
                     </Link>
-                    
                     {user && (
                         <div className="flex items-center justify-between space-x-4 font-clash">
                             <div className="md:flex md:items-center md:space-x-3">
-                                <img 
-                                    src={user.photoURL} 
+                                <img
+                                    src={user.photoURL || fallbackImage}
                                     alt={user.displayName}
                                     className="w-8 h-8 rounded-full"
                                 />
@@ -41,7 +41,7 @@ const Header = () => {
                                     {user.displayName}
                                 </span>
                             </div>
-                        <button className='btn btn-sm btn-outline btn-pale-yellow' onClick={handleSignOut}>Sign out</button>
+                            <button className='btn btn-sm btn-outline btn-pale-yellow' onClick={handleSignOut}>Sign out</button>
                         </div>
                     )}
                 </div>

@@ -10,7 +10,7 @@ const Main = () => {
     return (
         <div>
             {/* Only show header if not on login page */}
-            {!isLoginPage && <Header />}
+            {!isLoginPage && <Header  />}
             <Outlet />
         </div>
     );

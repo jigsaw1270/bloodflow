@@ -7,12 +7,12 @@ import { getFirestore } from "firebase/firestore";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyCn2z7ZMXFQ7dKtIJ2M4_uwYMXMmjwGu3s",
-  authDomain: "bloodflow-edaa2.firebaseapp.com",
-  projectId: "bloodflow-edaa2",
-  storageBucket: "bloodflow-edaa2.appspot.com",
-  messagingSenderId: "781415876925",
-  appId: "1:781415876925:web:29c12d09aea3ce52031d54"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
 };
 
 // Initialize Firebase
