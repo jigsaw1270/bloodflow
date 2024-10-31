@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/Authcontext';
 import { getAuth, signOut } from 'firebase/auth';
 import SpaceButton from '../Button/SpaceButton';
+import { Sprout } from 'lucide-react';
 
 const Header = () => {
     const { user } = useAuth();
@@ -24,8 +25,8 @@ const Header = () => {
         <div className="bg-white-skyblue shadow-sm rounded-xl">
             <div className="max-w-7xl mx-auto px-4 py-4">
                 <div className="md:flex justify-between items-center">
-                    <Link to="/" className="text-2xl font-bold text-white font-telma">
-                        Bloodflow
+                    <Link to="/" className="text-2xl font-bold text-white font-telma flex items-center gap-2">
+                      <Sprout/>  Bloodflow
                     </Link>
                     
                     {user && (

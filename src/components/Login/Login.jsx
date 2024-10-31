@@ -40,12 +40,12 @@ const Login = () => {
       );
 
     return (
-        <div className="min-h-screen bg-lavender-pink-gradient">
+        <div className="min-h-screen bg-lavender-pink-gradient rounded-xl shadow-yellow-100 shadow-lg">
         <h1 className='text-5xl font-telma my-4 pt-8 text-light-green'>Bloodflow</h1>
             <div className='flex flex-col items-center justify-center p-4 rounded-xl'>
             <div className='flex flex-col items-center'>
                 <Sprout className='size-20 text-light-green text-center'/>
-                <h1 className='font-semibold text-xl  font-clash md:px-20 text-light-green'>Menstrual blood is the only source of blood that is not automatically induced. Yet in modern society, this is the most hidden blood, the one so rarely spoken of and almost never seen, except privately by women.</h1>
+                <h1 className='font-medium text-xl  font-telma md:px-20 text-light-green'>Menstrual blood is the only source of blood that is not automatically induced. Yet in modern society, this is the most hidden blood, the one so rarely spoken of and almost never seen, except privately by women.</h1>
                 <img src={svglogin} alt="svglogin" className='w-[20rem]' />
             </div>
                 <div className="bg-light-green rounded-2xl shadow-lg w-full max-w-md overflow-hidden p-8">

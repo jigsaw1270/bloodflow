@@ -288,15 +288,15 @@ const PeriodTracker = () => {
         <div className="flex items-center justify-center space-x-4 mb-4">
           <div className="flex items-center">
             <div className="w-4 h-4 bg-red-semidark rounded-xl mr-2"></div>
-            <span className="text-sm">Current Period</span>
+            <span className="text-xs md:text-lg">Current Period</span>
           </div>
           <div className="flex items-center">
             <div className="w-4 h-4 bg-skyblue rounded-xl mr-2"></div>
-            <span className="text-sm">Ovulation</span>
+            <span className="text-xs md:text-lg">Ovulation</span>
           </div>
           <div className="flex items-center">
             <div className="w-4 h-4 bg-red-dark rounded-xl mr-2"></div>
-            <span className="text-sm">Predicted (±3 days)</span>
+            <span className="text-xs md:text-lg">Predicted (±3 days)</span>
           </div>
         </div>
 
